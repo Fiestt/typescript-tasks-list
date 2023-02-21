@@ -18,6 +18,7 @@ const SingleTodo = ({ todo, todos, setTodos, index }: Props) => {
     const [editTodo, setEditTodo] = useState<string>(todo.todo)
     
     const inputRef = useRef<HTMLInputElement>(null)
+    const titleRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         inputRef.current?.focus()
@@ -25,16 +26,30 @@ const SingleTodo = ({ todo, todos, setTodos, index }: Props) => {
 
 
     const handleDone = (id: number) => {
-        setTodos(todos.map((todo) => todo.id === id ? { ...todo, isDone: !todo.isDone } : todo))
+        let reuslt = todos.map((todo) => todo.id === id ? { ...todo, isDone: !todo.isDone } : todo)
+        setTodos(reuslt)
+        if (titleRef.current?.parentElement?.previousElementSibling?.innerHTML === "Completed tasks") {
+            localStorage.setItem("completed", JSON.stringify(reuslt))
+        } else {
+            localStorage.setItem("todos", JSON.stringify(reuslt))
+        }
     }
 
     const handleDelete = (id: number) => {
-        setTodos(todos.filter((todo) => todo.id !== id))
-    }
+        let result = todos.filter((todo) => todo.id !== id)
+        setTodos(result)
+        console.log(titleRef.current?.parentElement?.previousElementSibling?.innerHTML, todos)
+        if (titleRef.current?.parentElement?.previousElementSibling?.innerHTML === "Completed tasks") {
+            localStorage.setItem("completed", JSON.stringify(result))
+        } else {
+            localStorage.setItem("todos", JSON.stringify(result))
+        }
+    } 
 
     const handleEdit = () => {
         if (!edit && !todo.isDone) {
             setEdit(!edit)
+            
         }
     }
 
@@ -68,7 +83,7 @@ const SingleTodo = ({ todo, todos, setTodos, index }: Props) => {
                     )
                 )}
 
-                <div>
+                <div ref = {titleRef}>
                     <span className='icon'>
                         <AiFillEdit onClick={() => handleEdit()} />
                     </span>
