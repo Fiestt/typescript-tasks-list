@@ -4,20 +4,15 @@ import InputField from './components/Input/InputField';
 import { Todo } from './components/model';
 import TodoList from './components/TodoList/TodoList';
 import { DragDropContext, DropResult } from "react-beautiful-dnd"
-import { useAppDispatch, useAppSelector } from './store/hooks/hooks';
-import { addTodo, getNewCompletedTodos, getNewTodos } from './store/todoSlice/todoSlice';
 
 const App: React.FC = () => {
-  // const localTodos = JSON.parse(localStorage.getItem("todos") || "" ) || null
-  // const localCompletedTodos = JSON.parse(localStorage.getItem("completed") || "") || null
+
+  const localTodos = JSON.parse(localStorage.getItem("todos") || "")
+  const localCompletedTodos = JSON.parse(localStorage.getItem("completed") || "")
   const [todo, setTodo] = useState<string>("")
-  // const [todos, setTodos] = useState<Todo[]>([])
+  const [todos, setTodos] = useState<Todo[]>([...localTodos])
 
-  // const [completedTodos, setCompletedTodos] = useState<Todo[]>([])
-
-  const dispatch = useAppDispatch()
-  const todos = useAppSelector(state => state.todos.activeTodos)
-  const completedTodos = useAppSelector(state => state.todos.comletedTodos)
+  const [completedTodos, setCompletedTodos] = useState<Todo[]>([...localCompletedTodos])
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos))
@@ -26,27 +21,25 @@ const App: React.FC = () => {
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault()
     if (todo) {
-      // setTodos([...todos, { id: Date.now(), todo, isDone: false }])
-      dispatch(addTodo(todo))
+      setTodos([...todos, { id: Date.now(), todo, isDone: false }])
       setTodo("")
     }
   }
 
   const onDragEnd = (result: DropResult) => {
     const { source, destination} = result
-    console.log(result)
+    console.log(todos)
     if (!destination) return
 
     if (destination.droppableId === source.droppableId && 
       destination.index === source.index) return
 
       let add
-      let active = [...todos]
-      let complete = [...completedTodos]
-console.log(active, complete)
+      let active = todos
+      let complete = completedTodos
+
       if (source.droppableId === "TodosList") {
         add = active[source.index];
-        console.log(add, "SSS")
         active.splice(source.index, 1)
       } else {
         add = complete[source.index];
@@ -59,9 +52,9 @@ console.log(active, complete)
         complete.splice(destination.index, 0, add)
       }
 
-      dispatch(getNewCompletedTodos(complete))
+      setCompletedTodos(complete)
       localStorage.setItem("completed", JSON.stringify(complete))
-      dispatch(getNewTodos(active))
+      setTodos(active)
       localStorage.setItem("todos", JSON.stringify(active))
   }
 
@@ -72,7 +65,10 @@ console.log(active, complete)
 
         <InputField todo={todo} setTodo={setTodo} handleAdd={handleAdd} />
 
-        <TodoList/>
+        <TodoList todos={todos} 
+                  setTodos={setTodos} 
+                  completedTodos={completedTodos}
+                  setCompletedTodos={setCompletedTodos}/>
       </div>
     </DragDropContext>
   );

@@ -1,14 +1,19 @@
 import React, { useRef } from 'react'
 import { Droppable } from 'react-beautiful-dnd';
-import { useAppSelector } from '../../store/hooks/hooks';
 import { Todo } from '../model';
 import SingleTodo from '../SingleTodo/SingleTodo';
 import "../styles.css"
 
-const TodoList = () => {
+interface Props {
+  todos: Todo[];
+  setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
+  completedTodos: Todo[];
+  setCompletedTodos: React.Dispatch<React.SetStateAction<Todo[]>>
+}
+
+const TodoList = ({ todos, setTodos, completedTodos, setCompletedTodos }: Props) => {
   
-const activeTodos = useAppSelector(state => state.todos.activeTodos)
-const comletedTodos = useAppSelector(state => state.todos.comletedTodos)
+
 
   return <div className="container">
     <Droppable droppableId='TodosList'>
@@ -21,9 +26,10 @@ const comletedTodos = useAppSelector(state => state.todos.comletedTodos)
           <span className="todos__heading" >
             Active tasks
           </span>
-          {activeTodos.map((todo, i) => (
+          {todos.map((todo, i) => (
             <SingleTodo key={todo.id} 
-                        todo={todo}  
+                        todo={todo} todos={todos} 
+                        setTodos={setTodos} 
                         index={i}
                         />
           ))}
@@ -43,9 +49,11 @@ const comletedTodos = useAppSelector(state => state.todos.comletedTodos)
           <span className="todos__heading" >
             Completed tasks
           </span>
-          {comletedTodos.map((todo, i ) => (
+          {completedTodos.map((todo, i ) => (
             <SingleTodo key={todo.id} 
               todo={todo} 
+              todos={completedTodos} 
+              setTodos={setCompletedTodos}
               index={i} 
               />
           ))}

@@ -4,19 +4,15 @@ import { AiFillEdit, AiFillDelete } from "react-icons/ai"
 import { MdDone } from "react-icons/md"
 import "../styles.css"
 import { Draggable } from 'react-beautiful-dnd'
-import { useAppDispatch, useAppSelector } from '../../store/hooks/hooks'
-import { handleDoneActive, handleDoneCompleted, handleDeleteActive, handleDeleteCompleted, acceptEditActiveTodo, acceptEditCompletedTodo } from '../../store/todoSlice/todoSlice'
 
 type Props = {
     todo: Todo;
-
+    todos: Todo[];
+    setTodos: React.Dispatch<React.SetStateAction<Todo[]>>;
     index: number
 }
 
-const SingleTodo = ({ todo, index }: Props) => {
-
-    const todos = useAppSelector(state => state.todos.activeTodos)
-    const dispatch = useAppDispatch()
+const SingleTodo = ({ todo, todos, setTodos, index }: Props) => {
 
     const [edit, setEdit] = useState<Boolean>(false)
     const [editTodo, setEditTodo] = useState<string>(todo.todo)
@@ -30,36 +26,24 @@ const SingleTodo = ({ todo, index }: Props) => {
 
 
     const handleDone = (id: number) => {
-        console.log(todos)
-        let res = todos.find(todo => todo.id === id)
-        console.log(typeof res !== "undefined", res)
-        if (typeof res !== "undefined") {
-            dispatch(handleDoneActive(id))
+        let reuslt = todos.map((todo) => todo.id === id ? { ...todo, isDone: !todo.isDone } : todo)
+        setTodos(reuslt)
+        if (titleRef.current?.parentElement?.previousElementSibling?.innerHTML === "Completed tasks") {
+            localStorage.setItem("completed", JSON.stringify(reuslt))
         } else {
-            dispatch(handleDoneCompleted(id))
+            localStorage.setItem("todos", JSON.stringify(reuslt))
         }
-        // if (titleRef.current?.parentElement?.previousElementSibling?.innerHTML === "Completed tasks") {
-        //     localStorage.setItem("completed", JSON.stringify(reuslt))
-        // } else {
-        //     localStorage.setItem("todos", JSON.stringify(reuslt))
-        // }
     }
 
     const handleDelete = (id: number) => {
-
-        let res = todos.find(todo => todo.id === id)
-
-        if (typeof res !== "undefined") {
-            dispatch(handleDeleteActive(id))
+        let result = todos.filter((todo) => todo.id !== id)
+        setTodos(result)
+        console.log(titleRef.current?.parentElement?.previousElementSibling?.innerHTML, todos)
+        if (titleRef.current?.parentElement?.previousElementSibling?.innerHTML === "Completed tasks") {
+            localStorage.setItem("completed", JSON.stringify(result))
         } else {
-            dispatch(handleDeleteCompleted(id))
+            localStorage.setItem("todos", JSON.stringify(result))
         }
-        // console.log(titleRef.current?.parentElement?.previousElementSibling?.innerHTML, todos)
-        // if (titleRef.current?.parentElement?.previousElementSibling?.innerHTML === "Completed tasks") {
-        //     localStorage.setItem("completed", JSON.stringify(result))
-        // } else {
-        //     localStorage.setItem("todos", JSON.stringify(result))
-        // }
     } 
 
     const handleEdit = () => {
@@ -69,21 +53,11 @@ const SingleTodo = ({ todo, index }: Props) => {
         }
     }
 
-
     const acceptEdit = (e: React.FormEvent, id: number) => {
         e.preventDefault()
-
-        let res = todos.find(todo => todo.id === id)
-
-        if (typeof res !== "undefined") {
-            dispatch(acceptEditActiveTodo({id, editTodo}))
-        } else {
-            dispatch(acceptEditCompletedTodo({id, editTodo}))
-        }
-        dispatch(acceptEditActiveTodo({id, editTodo}))
-        // setTodos(todos.map((todo) => (
-        //     todo.id === id ? {...todo, todo: editTodo} : todo
-        // )))
+        setTodos(todos.map((todo) => (
+            todo.id === id ? {...todo, todo: editTodo} : todo
+        )))
         setEdit(false)
     }
 
