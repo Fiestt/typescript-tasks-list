@@ -1,7 +1,6 @@
-import React, { useRef } from 'react'
+import React from 'react'
 import { Droppable } from 'react-beautiful-dnd';
 import { useAppSelector } from '../../store/hooks/hooks';
-import { Todo } from '../model';
 import SingleTodo from '../SingleTodo/SingleTodo';
 import "../styles.css"
 

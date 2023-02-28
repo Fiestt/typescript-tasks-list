@@ -9,7 +9,6 @@ import { handleDoneActive, handleDoneCompleted, handleDeleteActive, handleDelete
 
 type Props = {
     todo: Todo;
-
     index: number
 }
 
@@ -32,34 +31,20 @@ const SingleTodo = ({ todo, index }: Props) => {
     const handleDone = (id: number) => {
         console.log(todos)
         let res = todos.find(todo => todo.id === id)
-        console.log(typeof res !== "undefined", res)
         if (typeof res !== "undefined") {
             dispatch(handleDoneActive(id))
         } else {
             dispatch(handleDoneCompleted(id))
         }
-        // if (titleRef.current?.parentElement?.previousElementSibling?.innerHTML === "Completed tasks") {
-        //     localStorage.setItem("completed", JSON.stringify(reuslt))
-        // } else {
-        //     localStorage.setItem("todos", JSON.stringify(reuslt))
-        // }
     }
 
     const handleDelete = (id: number) => {
-
         let res = todos.find(todo => todo.id === id)
-
         if (typeof res !== "undefined") {
             dispatch(handleDeleteActive(id))
         } else {
             dispatch(handleDeleteCompleted(id))
         }
-        // console.log(titleRef.current?.parentElement?.previousElementSibling?.innerHTML, todos)
-        // if (titleRef.current?.parentElement?.previousElementSibling?.innerHTML === "Completed tasks") {
-        //     localStorage.setItem("completed", JSON.stringify(result))
-        // } else {
-        //     localStorage.setItem("todos", JSON.stringify(result))
-        // }
     } 
 
     const handleEdit = () => {
@@ -69,21 +54,15 @@ const SingleTodo = ({ todo, index }: Props) => {
         }
     }
 
-
     const acceptEdit = (e: React.FormEvent, id: number) => {
         e.preventDefault()
-
         let res = todos.find(todo => todo.id === id)
-
         if (typeof res !== "undefined") {
             dispatch(acceptEditActiveTodo({id, editTodo}))
         } else {
             dispatch(acceptEditCompletedTodo({id, editTodo}))
         }
         dispatch(acceptEditActiveTodo({id, editTodo}))
-        // setTodos(todos.map((todo) => (
-        //     todo.id === id ? {...todo, todo: editTodo} : todo
-        // )))
         setEdit(false)
     }
 

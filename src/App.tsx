@@ -1,32 +1,34 @@
 import React, { useEffect, useState } from 'react';
 import './App.css';
 import InputField from './components/Input/InputField';
-import { Todo } from './components/model';
 import TodoList from './components/TodoList/TodoList';
 import { DragDropContext, DropResult } from "react-beautiful-dnd"
 import { useAppDispatch, useAppSelector } from './store/hooks/hooks';
-import { addTodo, getNewCompletedTodos, getNewTodos } from './store/todoSlice/todoSlice';
+import { getCurrentActiveTodos, getCurrentCompletedTodos, addTodo, getNewCompletedTodos, getNewTodos } from './store/todoSlice/todoSlice';
 
 const App: React.FC = () => {
-  // const localTodos = JSON.parse(localStorage.getItem("todos") || "" ) || null
-  // const localCompletedTodos = JSON.parse(localStorage.getItem("completed") || "") || null
-  const [todo, setTodo] = useState<string>("")
-  // const [todos, setTodos] = useState<Todo[]>([])
 
-  // const [completedTodos, setCompletedTodos] = useState<Todo[]>([])
+  const localTodos = JSON.parse(localStorage.getItem("todos") || "[]")
+  const localCompletedTodos = JSON.parse(localStorage.getItem("completed") || "[]") 
+  const [todo, setTodo] = useState<string>("")
 
   const dispatch = useAppDispatch()
+  useEffect(() => {
+    dispatch(getCurrentActiveTodos(localTodos))
+    dispatch(getCurrentCompletedTodos(localCompletedTodos))
+  }, [])
+
   const todos = useAppSelector(state => state.todos.activeTodos)
   const completedTodos = useAppSelector(state => state.todos.comletedTodos)
 
   useEffect(() => {
     localStorage.setItem("todos", JSON.stringify(todos))
-  }, [todos])
+    localStorage.setItem("completed", JSON.stringify(completedTodos))
+  }, [todos, completedTodos])
 
   const handleAdd = (e: React.FormEvent) => {
     e.preventDefault()
     if (todo) {
-      // setTodos([...todos, { id: Date.now(), todo, isDone: false }])
       dispatch(addTodo(todo))
       setTodo("")
     }
@@ -43,7 +45,7 @@ const App: React.FC = () => {
       let add
       let active = [...todos]
       let complete = [...completedTodos]
-console.log(active, complete)
+
       if (source.droppableId === "TodosList") {
         add = active[source.index];
         console.log(add, "SSS")
